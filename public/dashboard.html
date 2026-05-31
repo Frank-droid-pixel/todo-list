@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TaskMaster Pro — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/dashboard.css" />
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-top">
+      <div class="brand">
+        <div class="brand-icon">⚡</div>
+        <span class="brand-name">TaskMaster</span>
+      </div>
+      <button class="sidebar-close" id="sidebarClose">✕</button>
+    </div>
+
+    <nav class="nav">
+      <button class="nav-item active" data-view="all">
+        <span class="nav-icon">📋</span> All Tasks
+        <span class="nav-badge" id="badge-all">0</span>
+      </button>
+      <button class="nav-item" data-view="pending">
+        <span class="nav-icon">🕐</span> Pending
+        <span class="nav-badge" id="badge-pending">0</span>
+      </button>
+      <button class="nav-item" data-view="in-progress">
+        <span class="nav-icon">⚡</span> In Progress
+        <span class="nav-badge" id="badge-inprogress">0</span>
+      </button>
+      <button class="nav-item" data-view="completed">
+        <span class="nav-icon">✅</span> Completed
+        <span class="nav-badge" id="badge-completed">0</span>
+      </button>
+      <div class="nav-divider">Categories</div>
+      <button class="nav-item" data-category="work"><span class="nav-icon">💼</span> Work</button>
+      <button class="nav-item" data-category="personal"><span class="nav-icon">🏠</span> Personal</button>
+      <button class="nav-item" data-category="study"><span class="nav-icon">📚</span> Study</button>
+      <button class="nav-item" data-category="health"><span class="nav-icon">💪</span> Health</button>
+      <button class="nav-item" data-category="general"><span class="nav-icon">📌</span> General</button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info" id="userInfo">
+        <div class="user-avatar" id="userAvatar">?</div>
+        <div>
+          <div class="user-name" id="userName">Loading...</div>
+          <div class="user-email" id="userEmail">...</div>
+        </div>
+      </div>
+      <button class="btn-logout" id="logoutBtn">Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- Overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- Main Content -->
+  <main class="main">
+    <!-- Top Bar -->
+    <header class="topbar">
+      <button class="menu-toggle" id="menuToggle">☰</button>
+      <div class="topbar-left">
+        <h1 class="page-title" id="pageTitle">All Tasks</h1>
+        <div class="search-bar">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="Search tasks..." />
+        </div>
+      </div>
+      <div class="topbar-right">
+        <select id="filterPriority" class="filter-select">
+          <option value="all">All Priority</option>
+          <option value="high">🔴 High</option>
+          <option value="medium">🟡 Medium</option>
+          <option value="low">🟢 Low</option>
+        </select>
+        <button class="btn-new" id="newTaskBtn">+ New Task</button>
+      </div>
+    </header>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="stat-num" id="stat-total">0</div>
+        <div class="stat-label">Total</div>
+      </div>
+      <div class="stat-card urgent">
+        <div class="stat-num" id="stat-high">0</div>
+        <div class="stat-label">High Priority</div>
+      </div>
+      <div class="stat-card warning">
+        <div class="stat-num" id="stat-overdue">0</div>
+        <div class="stat-label">Overdue</div>
+      </div>
+      <div class="stat-card success">
+        <div class="stat-num" id="stat-done">0</div>
+        <div class="stat-label">Completed</div>
+      </div>
+      <div class="stat-card">
+        <div class="progress-ring-wrap">
+          <svg class="progress-ring" width="44" height="44">
+            <circle class="ring-bg" cx="22" cy="22" r="18" />
+            <circle class="ring-fill" id="ringFill" cx="22" cy="22" r="18" />
+          </svg>
+          <span class="progress-pct" id="progressPct">0%</span>
+        </div>
+        <div class="stat-label">Progress</div>
+      </div>
+    </div>
+
+    <!-- Countdown Banner -->
+    <div class="countdown-banner" id="countdownBanner" style="display:none;">
+      <div class="countdown-icon">⏰</div>
+      <div class="countdown-info">
+        <div class="countdown-task" id="countdownTask">Task name</div>
+        <div class="countdown-label">Next deadline</div>
+      </div>
+      <div class="countdown-timer" id="countdownTimer">00:00:00</div>
+      <button class="countdown-close" id="countdownClose">✕</button>
+    </div>
+
+    <!-- Task Grid -->
+    <div class="tasks-section">
+      <div class="tasks-header">
+        <span class="tasks-count" id="tasksCount">0 tasks</span>
+        <div class="view-toggle">
+          <button class="view-btn active" id="viewGrid" title="Grid view">⊞</button>
+          <button class="view-btn" id="viewList" title="List view">≡</button>
+        </div>
+        <button class="btn-clear-completed" id="clearCompletedBtn">Clear Completed</button>
+      </div>
+
+      <div class="tasks-grid" id="tasksContainer">
+        <div class="empty-state" id="emptyState">
+          <div class="empty-icon">📭</div>
+          <h3>No tasks yet</h3>
+          <p>Create your first task to get started</p>
+          <button class="btn-new" onclick="document.getElementById('newTaskBtn').click()">+ Create Task</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Task Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="taskModal">
+      <div class="modal-header">
+        <h2 id="modalTitle">New Task</h2>
+        <button class="modal-close" id="modalClose">✕</button>
+      </div>
+
+      <form id="taskForm" novalidate>
+        <input type="hidden" id="taskId" />
+
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label>Task Title *</label>
+            <input type="text" id="taskTitle" placeholder="What needs to be done?" required maxlength="100" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="taskDesc" placeholder="Add details, notes, or sub-tasks..." rows="3"></textarea>
+        </div>
+
+        <div class="form-row three-col">
+          <div class="form-group">
+            <label>Priority</label>
+            <select id="taskPriority">
+              <option value="low">🟢 Low</option>
+              <option value="medium" selected>🟡 Medium</option>
+              <option value="high">🔴 High</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="taskStatus">
+              <option value="pending">🕐 Pending</option>
+              <option value="in-progress">⚡ In Progress</option>
+              <option value="completed">✅ Completed</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Category</label>
+            <select id="taskCategory">
+              <option value="general">📌 General</option>
+              <option value="work">💼 Work</option>
+              <option value="personal">🏠 Personal</option>
+              <option value="study">📚 Study</option>
+              <option value="health">💪 Health</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Deadline & Reminder</label>
+          <input type="datetime-local" id="taskDeadline" />
+          <small class="form-hint">📧 Reminder email will be sent 24 hours before deadline</small>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" id="cancelTaskBtn">Cancel</button>
+          <button type="submit" class="btn-save" id="saveTaskBtn">
+            <span class="btn-text">Save Task</span>
+            <span class="btn-loader hidden">◌</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Confirm Modal -->
+  <div class="modal-overlay" id="deleteOverlay">
+    <div class="modal modal-sm">
+      <div class="modal-header danger-header">
+        <h2>Delete Task</h2>
+        <button class="modal-close" onclick="closeDeleteModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete <strong id="deleteTaskName">"this task"</strong>?</p>
+        <p class="delete-warning">This action cannot be undone.</p>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+        <button class="btn-danger" id="confirmDeleteBtn">Delete Task</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TaskMaster Pro — Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/auth.css" />
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="brand">
+        <div class="brand-icon">⚡</div>
+        <span class="brand-name">TaskMaster Pro</span>
+      </div>
+
+      <div class="auth-header">
+        <h1>Welcome back</h1>
+        <p>Sign in to manage your tasks</p>
+      </div>
+
+      <div id="error-msg" class="alert alert-error hidden"></div>
+      <div id="success-msg" class="alert alert-success hidden"></div>
+
+      <form id="loginForm" novalidate>
+        <div class="form-group">
+          <label for="email">Email address</label>
+          <div class="input-wrapper">
+            <span class="input-icon">✉</span>
+            <input type="email" id="email" name="email" placeholder="you@example.com" required autocomplete="email" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">
+            Password
+            <a href="#" class="label-link" id="forgotLink">Forgot password?</a>
+          </label>
+          <div class="input-wrapper">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required autocomplete="current-password" />
+            <button type="button" class="toggle-password" id="togglePass">👁</button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary" id="loginBtn">
+          <span class="btn-text">Sign In</span>
+          <span class="btn-loader hidden">◌</span>
+        </button>
+      </form>
+
+      <p class="auth-switch">Don't have an account? <a href="/register">Create one</a></p>
+    </div>
+
+    <div class="auth-features">
+      <div class="feature-item"><span>✓</span> Smart task organization</div>
+      <div class="feature-item"><span>✓</span> Email reminders before deadlines</div>
+      <div class="feature-item"><span>✓</span> Real-time countdown timers</div>
+      <div class="feature-item"><span>✓</span> Priority-based task management</div>
+    </div>
+  </div>
+
+  <script src="/js/auth.js"></script>
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await handleAuth('/api/auth/login', {
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value
+      }, 'loginBtn');
+    });
+
+    document.getElementById('togglePass').addEventListener('click', () => {
+      const input = document.getElementById('password');
+      input.type = input.type === 'password' ? 'text' : 'password';
+    });
+
+    document.getElementById('forgotLink').addEventListener('click', (e) => {
+      e.preventDefault();
+      showAlert('error', 'Password reset: Contact admin or update directly in the database.');
+    });
+  </script>
+</body>
+</html>
