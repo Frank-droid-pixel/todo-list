@@ -20,15 +20,19 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Session configuration
+// ADD this line before app.use(session(...))  ← CRITICAL FOR RENDER
+app.set('trust proxy', 1);
+
 app.use(session({
-  store: new SQLiteStore({ db: 'sessions.sqlite', dir: './' }),
+  store: new SQLiteStore({ db: 'sessions.sqlite', dir: sessionDir }), // ← use sessionDir not './'
   secret: process.env.SESSION_SECRET || 'taskmaster-super-secret-key-change-in-production',
   resave: false,
   saveUninitialized: false,
   cookie: {
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
-    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // ← ADD THIS LINE
+    maxAge: 7 * 24 * 60 * 60 * 1000
   }
 }));
 
