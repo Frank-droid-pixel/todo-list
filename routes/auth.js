@@ -31,12 +31,10 @@ router.post('/api/auth/register', (req, res) => {
     return res.status(400).json({ error: 'Invalid email address' });
   }
 
-  // Check if email already exists
   db.get('SELECT id FROM users WHERE email = ?', [email], (err, row) => {
     if (err) return res.status(500).json({ error: 'Database error' });
     if (row) return res.status(409).json({ error: 'Email already registered' });
 
-    // Hash password
     bcrypt.hash(password, 12, (err, hash) => {
       if (err) return res.status(500).json({ error: 'Error processing password' });
 
@@ -50,7 +48,10 @@ router.post('/api/auth/register', (req, res) => {
           req.session.userName = name.trim();
           req.session.userEmail = email.toLowerCase();
 
-          res.json({ success: true, message: 'Account created successfully', redirect: '/dashboard' });
+          req.session.save((err) => {
+            if (err) return res.status(500).json({ error: 'Session error' });
+            res.json({ success: true, message: 'Account created successfully', redirect: '/dashboard' });
+          });
         }
       );
     });
@@ -77,7 +78,10 @@ router.post('/api/auth/login', (req, res) => {
       req.session.userName = user.name;
       req.session.userEmail = user.email;
 
-      res.json({ success: true, message: 'Login successful', redirect: '/dashboard' });
+      req.session.save((err) => {
+        if (err) return res.status(500).json({ error: 'Session error' });
+        res.json({ success: true, message: 'Login successful', redirect: '/dashboard' });
+      });
     });
   });
 });

@@ -22,7 +22,6 @@ async function handleAuth(url, data, btnId) {
   btnText.classList.add('hidden');
   btnLoader.classList.remove('hidden');
 
-  // Clear previous alerts
   document.getElementById('error-msg').classList.add('hidden');
   document.getElementById('success-msg').classList.add('hidden');
 
@@ -30,6 +29,7 @@ async function handleAuth(url, data, btnId) {
     const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify(data)
     });
 
@@ -39,7 +39,7 @@ async function handleAuth(url, data, btnId) {
       showAlert('error', result.error);
     } else if (result.success) {
       showAlert('success', result.message || 'Success!');
-      setTimeout(() => window.location.href = result.redirect || '/dashboard', 800);
+      setTimeout(() => window.location.replace(result.redirect || '/dashboard'), 600);
     }
   } catch (err) {
     showAlert('error', 'Connection error. Please try again.');

@@ -13,30 +13,35 @@ const { initEmailService, startReminderCron } = require('./emails/reminderServic
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ─── Middleware ───────────────────────────────────────────────────
+// CRITICAL: Trust Render's reverse proxy
+app.set('trust proxy', 1);
+
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Session configuration
-// ADD this line before app.use(session(...))  ← CRITICAL FOR RENDER
-app.set('trust proxy', 1);
+// Session store path
+const sessionDir = process.env.DB_PATH
+  ? path.dirname(process.env.DB_PATH)
+  : __dirname;
 
+// Session configuration
 app.use(session({
-  store: new SQLiteStore({ db: 'sessions.sqlite', dir: sessionDir }), // ← use sessionDir not './'
+  store: new SQLiteStore({ db: 'sessions.sqlite', dir: sessionDir }),
   secret: process.env.SESSION_SECRET || 'taskmaster-super-secret-key-change-in-production',
   resave: false,
   saveUninitialized: false,
   cookie: {
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // ← ADD THIS LINE
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000
   }
 }));
 
-// ─── Routes ───────────────────────────────────────────────────────
+// Routes
 app.use('/', authRoutes);
 app.use('/', taskRoutes);
 
@@ -64,18 +69,11 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
-// ─── Start Server ─────────────────────────────────────────────────
+// Start server
 app.listen(PORT, () => {
-  console.log('\n╔════════════════════════════════════════╗');
-  console.log(`║   TaskMaster Pro running on port ${PORT}    ║`);
-  console.log('╚════════════════════════════════════════╝');
-  console.log(`\n🌐 Open: http://localhost:${PORT}`);
-  console.log(`📁 Database: ./database.sqlite`);
-
-  // Initialize email service
+  console.log(`\n✅ TaskMaster Pro running on port ${PORT}`);
+  console.log(`🌐 Open: http://localhost:${PORT}`);
   initEmailService();
-
-  // Start reminder cron job
   startReminderCron();
 });
 
